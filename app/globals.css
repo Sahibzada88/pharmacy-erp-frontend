@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 999px;
+}
+
+html,
+body {
+  background: #0b1220;
+  color: #eef2f6;
+}
+
+body {
+  font-family: var(--font-body), sans-serif;
+}
+
+/* ---------------------------------------------------------------------
+   Ambient mesh background — the thing the glass panels are seen "through".
+   Two soft radial blooms (emerald + amber) drifting slowly on the ink base.
+--------------------------------------------------------------------- */
+.mesh-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: #0b1220;
+}
+.mesh-bg::before,
+.mesh-bg::after {
+  content: "";
+  position: absolute;
+  width: 65vw;
+  height: 65vw;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.32;
+}
+.mesh-bg::before {
+  top: -18%;
+  left: -12%;
+  background: radial-gradient(circle at 30% 30%, #0f9d74, transparent 65%);
+  animation: mesh-drift 24s ease-in-out infinite alternate;
+}
+.mesh-bg::after {
+  bottom: -22%;
+  right: -14%;
+  background: radial-gradient(circle at 60% 60%, #e8a33d, transparent 65%);
+  animation: mesh-drift 28s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes mesh-drift {
+  0% {
+    transform: translate(0%, 0%) scale(1);
+  }
+  100% {
+    transform: translate(-6%, 4%) scale(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mesh-bg::before,
+  .mesh-bg::after {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Glass surface primitives
+--------------------------------------------------------------------- */
+.glass {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.02)
+  );
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-strong {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.12),
+    rgba(255, 255, 255, 0.04)
+  );
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.glass-edge {
+  position: relative;
+}
+.glass-edge::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 157, 116, 0.5),
+    rgba(255, 255, 255, 0.05) 40%,
+    rgba(232, 163, 61, 0.35)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Light-surface glass card, used inside light panels/tables for contrast */
+.glass-light {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(11, 18, 32, 0.06);
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
