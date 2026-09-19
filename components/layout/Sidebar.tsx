@@ -12,32 +12,37 @@ import {
   Users,
   UserCog,
   Building2,
+  Receipt,
   LogOut,
 } from "lucide-react";
 import { useAuth, ROLE_LABELS } from "@/lib/auth";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/lib/types";
 
 interface NavItem {
   href: string;
-  label: string;
+  labelKey: string;
+  tourId: string;
   icon: React.ElementType;
   roles: Role[];
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/owner", label: "Overview", icon: LayoutGrid, roles: ["OWNER", "MANAGER"] },
-  { href: "/pos", label: "Point of Sale", icon: ShoppingCart, roles: ["OWNER", "MANAGER", "CASHIER"] },
-  { href: "/inventory", label: "Inventory", icon: Boxes, roles: ["OWNER", "MANAGER", "PHARMACIST"] },
-  { href: "/suppliers", label: "Suppliers", icon: Truck, roles: ["OWNER", "MANAGER", "ACCOUNTANT"] },
-  { href: "/finance", label: "Finance", icon: Wallet, roles: ["OWNER", "MANAGER", "ACCOUNTANT"] },
-  { href: "/crm", label: "Customers", icon: Users, roles: ["OWNER", "MANAGER", "CASHIER"] },
-  { href: "/staff", label: "Staff", icon: UserCog, roles: ["OWNER", "MANAGER"] },
-  { href: "/branches", label: "Branches", icon: Building2, roles: ["OWNER"] },
+  { href: "/owner", labelKey: "nav.overview", tourId: "nav-overview", icon: LayoutGrid, roles: ["OWNER", "MANAGER"] },
+  { href: "/pos", labelKey: "nav.pos", tourId: "nav-pos", icon: ShoppingCart, roles: ["OWNER", "MANAGER", "CASHIER"] },
+  { href: "/invoices", labelKey: "nav.invoices", tourId: "nav-invoices", icon: Receipt, roles: ["OWNER", "MANAGER", "CASHIER", "ACCOUNTANT"] },
+  { href: "/inventory", labelKey: "nav.inventory", tourId: "nav-inventory", icon: Boxes, roles: ["OWNER", "MANAGER", "PHARMACIST"] },
+  { href: "/suppliers", labelKey: "nav.suppliers", tourId: "nav-suppliers", icon: Truck, roles: ["OWNER", "MANAGER", "ACCOUNTANT"] },
+  { href: "/finance", labelKey: "nav.finance", tourId: "nav-finance", icon: Wallet, roles: ["OWNER", "MANAGER", "ACCOUNTANT"] },
+  { href: "/crm", labelKey: "nav.customers", tourId: "nav-customers", icon: Users, roles: ["OWNER", "MANAGER", "CASHIER"] },
+  { href: "/staff", labelKey: "nav.staff", tourId: "nav-staff", icon: UserCog, roles: ["OWNER", "MANAGER"] },
+  { href: "/branches", labelKey: "nav.branches", tourId: "nav-branches", icon: Building2, roles: ["OWNER"] },
 ];
 
 export function Sidebar() {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const pathname = usePathname();
   if (!user) return null;
 
@@ -45,7 +50,7 @@ export function Sidebar() {
 
   return (
     <aside className="glass sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-white/10 p-5 md:flex">
-      <div className="flex items-center gap-2.5 px-1 pb-8 pt-1">
+      <div data-tour="sidebar-logo" className="flex items-center gap-2.5 px-1 pb-8 pt-1">
         <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15">
           <div className="absolute h-4 w-1.5 rounded-full bg-emerald-400" />
           <div className="absolute h-1.5 w-4 rounded-full bg-emerald-400" />
@@ -56,7 +61,7 @@ export function Sidebar() {
         </div>
       </div>
 
-      <nav className="flex-1 space-y-1">
+      <nav data-tour="sidebar-nav" className="flex-1 space-y-1">
         {items.map((item) => {
           const active = pathname?.startsWith(item.href);
           const Icon = item.icon;
@@ -64,6 +69,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              data-tour={item.tourId}
               className={cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                 active
@@ -72,7 +78,7 @@ export function Sidebar() {
               )}
             >
               <Icon className="h-[18px] w-[18px]" size={18} />
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           );
         })}
@@ -98,7 +104,7 @@ export function Sidebar() {
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-ink-100/60 transition-colors hover:bg-danger/10 hover:text-danger"
         >
           <LogOut className="h-[18px] w-[18px]" size={18} />
-          Sign out
+          {t("nav.signOut")}
         </button>
       </div>
     </aside>

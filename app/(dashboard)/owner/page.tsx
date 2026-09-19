@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useBranchFilter } from "../layout";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { StatTile } from "@/components/ui/StatTile";
 import { Badge } from "@/components/ui/Badge";
@@ -27,6 +28,7 @@ const DATE_TO = todayISO();
 
 export default function OwnerDashboardPage() {
   const { branchId } = useBranchFilter();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<OwnerDashboardSummary | null>(null);
   const [trend, setTrend] = useState<any[]>([]);
@@ -78,8 +80,8 @@ export default function OwnerDashboardPage() {
   return (
     <div className="space-y-6">
       <p className="text-sm text-ink-100/45">
-        Showing {formatDate(DATE_FROM)} — {formatDate(DATE_TO)}
-        {branchId ? "" : " · all branches"}
+        {t("ownerDashboard.showing")} {formatDate(DATE_FROM)} — {formatDate(DATE_TO)}
+        {branchId ? "" : ` · ${t("common.allBranches").toLowerCase()}`}
       </p>
 
       {/* KPI hero row */}
@@ -89,31 +91,35 @@ export default function OwnerDashboardPage() {
         ) : (
           <>
             <StatTile
-              label="Net sales"
+              label={t("ownerDashboard.netSales")}
+              tooltip={t("ownerDashboard.netSalesHint")}
               value={formatCurrency(summary.net_sales)}
               icon={TrendingUp}
               tone="emerald"
-              sublabel={`${formatNumber(summary.total_invoices)} invoices`}
+              sublabel={`${formatNumber(summary.total_invoices)} ${t("ownerDashboard.invoicesCount")}`}
             />
             <StatTile
-              label="Gross profit"
+              label={t("ownerDashboard.grossProfit")}
+              tooltip={t("ownerDashboard.grossProfitHint")}
               value={formatCurrency(summary.gross_profit)}
               icon={Wallet}
               tone="emerald"
             />
             <StatTile
-              label="Stock value"
+              label={t("ownerDashboard.stockValue")}
+              tooltip={t("ownerDashboard.stockValueHint")}
               value={formatCurrency(summary.total_stock_value)}
               icon={Boxes}
               tone="amber"
-              sublabel={`${formatNumber(summary.low_stock_items)} items low`}
+              sublabel={`${formatNumber(summary.low_stock_items)} ${t("ownerDashboard.itemsLow")}`}
             />
             <StatTile
-              label="Bank balance"
+              label={t("ownerDashboard.bankBalance")}
+              tooltip={t("ownerDashboard.bankBalanceHint")}
               value={formatCurrency(summary.total_bank_balance)}
               icon={Landmark}
               tone="neutral"
-              sublabel={`Owed to suppliers: ${formatCurrency(summary.total_supplier_dues)}`}
+              sublabel={`${t("ownerDashboard.owedToSuppliers")}: ${formatCurrency(summary.total_supplier_dues)}`}
             />
           </>
         )}
@@ -123,10 +129,10 @@ export default function OwnerDashboardPage() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">
         <GlassCard className="p-6">
           <div className="mb-1 flex items-center justify-between">
-            <h3 className="font-display text-base font-semibold text-white">Sales &amp; profit trend</h3>
+            <h3 className="font-display text-base font-semibold text-white">{t("ownerDashboard.salesTrend")}</h3>
             <div className="flex items-center gap-4 text-xs text-ink-100/45">
-              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-400" /> Net sales</span>
-              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-amber-400" /> Gross profit</span>
+              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-400" /> {t("ownerDashboard.netSales")}</span>
+              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-amber-400" /> {t("ownerDashboard.grossProfit")}</span>
             </div>
           </div>
           {loading ? (
@@ -139,7 +145,7 @@ export default function OwnerDashboardPage() {
         </GlassCard>
 
         <GlassCard className="p-6">
-          <h3 className="mb-1 font-display text-base font-semibold text-white">Payment mix</h3>
+          <h3 className="mb-1 font-display text-base font-semibold text-white">{t("ownerDashboard.paymentMix")}</h3>
           {loading ? <Skeleton className="h-[240px] w-full" /> : <PaymentMixChart data={paymentMix} />}
         </GlassCard>
       </div>
@@ -147,16 +153,16 @@ export default function OwnerDashboardPage() {
       {/* Lower grid: top medicines, low stock, expiry, supplier dues */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <ListCard
-          title="Top selling medicines"
+          title={t("ownerDashboard.topMedicines")}
           icon={Receipt}
           loading={loading}
           rows={topMedicines}
-          empty="No sales yet to rank."
+          empty={t("ownerDashboard.noSalesYet")}
           renderRow={(m) => (
             <>
               <div>
                 <p className="text-sm font-medium text-white">{m.medicine_name}</p>
-                <p className="text-xs text-ink-100/45">{formatNumber(m.units_sold)} units sold</p>
+                <p className="text-xs text-ink-100/45">{formatNumber(m.units_sold)} {t("ownerDashboard.unitsSold")}</p>
               </div>
               <p className="font-display text-sm font-semibold text-emerald-400">{formatCurrency(m.revenue)}</p>
             </>
@@ -164,11 +170,11 @@ export default function OwnerDashboardPage() {
         />
 
         <ListCard
-          title="Low stock alerts"
+          title={t("ownerDashboard.lowStock")}
           icon={AlertTriangle}
           loading={loading}
           rows={lowStock}
-          empty="Nothing below reorder level. Stock looks healthy."
+          empty={t("ownerDashboard.stockHealthy")}
           renderRow={(m) => (
             <>
               <div>
@@ -181,11 +187,11 @@ export default function OwnerDashboardPage() {
         />
 
         <ListCard
-          title="Expiring within 60 days"
+          title={t("ownerDashboard.expiringSoon")}
           icon={Clock}
           loading={loading}
           rows={expiring}
-          empty="No batches expiring soon."
+          empty={t("ownerDashboard.noExpiring")}
           renderRow={(b) => (
             <>
               <div>
@@ -202,11 +208,11 @@ export default function OwnerDashboardPage() {
         />
 
         <ListCard
-          title="Amounts owed to suppliers"
+          title={t("ownerDashboard.supplierDues")}
           icon={Truck}
           loading={loading}
           rows={supplierDues.filter((s) => s.balance_due > 0)}
-          empty="No outstanding supplier balances."
+          empty={t("ownerDashboard.noDues")}
           renderRow={(s) => (
             <>
               <p className="text-sm font-medium text-white">{s.supplier_name}</p>

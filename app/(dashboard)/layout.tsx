@@ -3,8 +3,11 @@
 import React, { useEffect, useState, createContext, useContext } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
+import { HelpButton } from "@/components/ui/HelpButton";
+import { AppTour } from "@/components/tour/AppTour";
 
 interface BranchFilterContextValue {
   branchId: number | null;
@@ -16,10 +19,18 @@ const BranchFilterContext = createContext<BranchFilterContextValue>({
 });
 export const useBranchFilter = () => useContext(BranchFilterContext);
 
-const PAGE_META: Record<string, { title: string; subtitle: string }> = {
-  "/owner": { title: "Overview", subtitle: "Chain performance at a glance" },
-  "/pos": { title: "Point of Sale", subtitle: "Ring up a sale" },
-  "/inventory": { title: "Inventory", subtitle: "Stock, batches & expiry" },
+// Keys map into the translation dictionary (lib/i18n/translations.ts).
+// Add a matching `<page>: { title, subtitle }` block there for new pages.
+const PAGE_META_KEYS: Record<string, { titleKey: string; subtitleKey: string }> = {
+  "/owner": { titleKey: "ownerDashboard.title", subtitleKey: "ownerDashboard.subtitle" },
+  "/pos": { titleKey: "pos.title", subtitleKey: "pos.subtitle" },
+  "/inventory": { titleKey: "inventory.title", subtitleKey: "inventory.subtitle" },
+};
+
+// Pages not yet in the translation dictionary fall back to plain English —
+// extend PAGE_META_KEYS + translations.ts to localize them too.
+const PAGE_META_FALLBACK: Record<string, { title: string; subtitle: string }> = {
+  "/invoices": { title: "Invoices", subtitle: "Browse, print & download past sales" },
   "/suppliers": { title: "Suppliers", subtitle: "Purchase orders & payables" },
   "/finance": { title: "Finance", subtitle: "Bank, cash & expenses" },
   "/crm": { title: "Customers", subtitle: "Loyalty & purchase history" },
@@ -29,6 +40,7 @@ const PAGE_META: Record<string, { title: string; subtitle: string }> = {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
   const [branchId, setBranchId] = useState<number | null>(null);
@@ -47,7 +59,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
-  const meta = PAGE_META[pathname || ""] || { title: "Dashboard", subtitle: "" };
+  const matchedKey =
+    (pathname && pathname in PAGE_META_KEYS && pathname) ||
+    Object.keys(PAGE_META_KEYS).find((key) => pathname?.startsWith(key + "/"));
+
+  const meta = matchedKey
+    ? { title: t(PAGE_META_KEYS[matchedKey].titleKey), subtitle: t(PAGE_META_KEYS[matchedKey].subtitleKey) }
+    : PAGE_META_FALLBACK[pathname || ""] ||
+      PAGE_META_FALLBACK[Object.keys(PAGE_META_FALLBACK).find((key) => pathname?.startsWith(key + "/")) || ""] || {
+        title: "Dashboard",
+        subtitle: "",
+      };
 
   return (
     <BranchFilterContext.Provider value={{ branchId, setBranchId }}>
@@ -63,6 +85,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <main className="flex-1 p-5 md:p-8">{children}</main>
         </div>
       </div>
+      <HelpButton />
+      <AppTour />
     </BranchFilterContext.Provider>
   );
 }
+

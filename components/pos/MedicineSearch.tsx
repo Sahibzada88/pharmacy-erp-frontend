@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Search, Package } from "lucide-react";
 import { api } from "@/lib/api";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Input } from "@/components/ui/Input";
 import { Skeleton, EmptyState } from "@/components/ui/Skeleton";
@@ -15,6 +16,7 @@ interface MedicineSearchProps {
 }
 
 export function MedicineSearch({ branchId, onAdd }: MedicineSearchProps) {
+  const { t } = useLanguage();
   const [query, setQuery] = useState("");
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +60,7 @@ export function MedicineSearch({ branchId, onAdd }: MedicineSearchProps) {
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search medicine by name, generic name, SKU or barcode…"
+          placeholder={t("pos.searchPlaceholder")}
           className="pl-10"
           autoFocus
         />
@@ -89,7 +91,7 @@ export function MedicineSearch({ branchId, onAdd }: MedicineSearchProps) {
                   <p className="text-xs text-ink-100/40">{med.pack_size || med.unit_type}</p>
                 </div>
                 <span className="mt-auto text-xs font-medium text-ink-100/50">
-                  {med.total_stock > 0 ? `${med.total_stock} in stock` : "Out of stock"}
+                  {med.total_stock > 0 ? `${med.total_stock} ${t("pos.inStock")}` : t("pos.outOfStock")}
                 </span>
               </button>
             ))}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
+import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import { Toaster } from "@/components/ui/Toast";
 
 const display = Space_Grotesk({
@@ -26,10 +27,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${display.variable} ${body.variable}`}>
       <body className="min-h-screen antialiased">
         <div className="mesh-bg" />
-        <AuthProvider>
-          <div className="relative z-10">{children}</div>
-          <Toaster />
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <div className="relative z-10">{children}</div>
+            <Toaster />
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -2,14 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, Languages } from "lucide-react";
 import { useAuth, ROLE_HOME } from "@/lib/auth";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 
 export default function LoginPage() {
   const { user, login, loading } = useAuth();
+  const { t, locale, toggleLocale } = useLanguage();
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +32,7 @@ export default function LoginPage() {
     try {
       await login(username, password);
     } catch (err: any) {
-      setError(err.message || "Could not sign in. Check your username and password.");
+      setError(err.message || t("login.invalidCredentials"));
     } finally {
       setSubmitting(false);
     }
@@ -38,6 +40,15 @@ export default function LoginPage() {
 
   return (
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[1.1fr_1fr]">
+      {/* Language toggle - always visible, works before login too */}
+      <button
+        onClick={toggleLocale}
+        className="glass fixed right-5 top-5 z-20 flex items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2 text-sm font-medium text-white/80 transition-colors hover:bg-white/10"
+      >
+        <Languages className="h-4 w-4" />
+        {locale === "en" ? "اردو" : "EN"}
+      </button>
+
       {/* Left: brand story */}
       <div className="relative hidden overflow-hidden p-14 lg:flex lg:flex-col lg:justify-between">
         <FloatingCapsules />
@@ -50,24 +61,23 @@ export default function LoginPage() {
         </div>
 
         <div className="relative z-10 max-w-md">
-          <p className="mb-4 text-sm font-medium text-emerald-400">Chain management, in one place</p>
+          <p className="mb-4 text-sm font-medium text-emerald-400">{t("login.tagline")}</p>
           <h1 className="font-display text-5xl font-semibold leading-[1.08] tracking-tight text-white">
-            Every branch,
+            {t("login.heroTitle1")}
             <br />
-            every rupee,
+            {t("login.heroTitle2")}
             <br />
-            one screen.
+            {t("login.heroTitle3")}
           </h1>
           <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-ink-100/60">
-            Stock, sales, suppliers and cash — tracked live across every branch,
-            with the right view for whoever's looking: owner, cashier, pharmacist or accountant.
+            {t("login.heroSubtitle")}
           </p>
         </div>
 
         <div className="relative z-10 flex gap-8 text-sm text-ink-100/45">
-          <span>Real-time stock</span>
-          <span>Role-based access</span>
-          <span>Branch analytics</span>
+          <span>{t("login.featureStock")}</span>
+          <span>{t("login.featureRoles")}</span>
+          <span>{t("login.featureAnalytics")}</span>
         </div>
       </div>
 
@@ -82,12 +92,12 @@ export default function LoginPage() {
             <span className="font-display text-sm font-semibold text-white">Rahat Pharmacy</span>
           </div>
 
-          <h2 className="font-display text-2xl font-semibold text-white">Welcome back</h2>
-          <p className="mt-1.5 text-sm text-ink-100/50">Sign in with the account your branch gave you.</p>
+          <h2 className="font-display text-2xl font-semibold text-white">{t("login.welcomeBack")}</h2>
+          <p className="mt-1.5 text-sm text-ink-100/50">{t("login.signInSubtitle")}</p>
 
           <form onSubmit={handleSubmit} className="mt-7 space-y-4">
             <div>
-              <Label>Username</Label>
+              <Label>{t("login.username")}</Label>
               <Input
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -97,7 +107,7 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <Label>Password</Label>
+              <Label>{t("login.password")}</Label>
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}
@@ -125,13 +135,13 @@ export default function LoginPage() {
             )}
 
             <Button type="submit" className="w-full" size="lg" loading={submitting}>
-              Sign in
+              {t("login.signIn")}
               {!submitting && <ArrowRight className="h-4 w-4" />}
             </Button>
           </form>
 
           <p className="mt-6 text-center text-xs text-ink-100/35">
-            Forgot your password? Ask your branch manager or the owner to reset it.
+            {t("login.forgotPassword")}
           </p>
         </GlassCard>
       </div>
