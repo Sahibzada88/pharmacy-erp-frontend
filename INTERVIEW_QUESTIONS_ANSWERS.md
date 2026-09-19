@@ -276,7 +276,7 @@ Main keyboard navigation, visible focus states, proper labels, icon-only buttons
 
 Playwright E2E tests teen important flows cover karte hain:
 
-- Authentication: role redirects, wrong password, role-specific sidebar aur refresh ke baad session
+- AAuthentication: role redirects, wrong password, role-specific sidebar aur refresh ke baad session
 - POS: medicine search, cart add, checkout, receipt Print/Download aur stock quantity ceiling
 - Invoices: list/empty state, search filtering aur invoice detail Print/Download
 
